@@ -1,6 +1,6 @@
 package sorts;
 
-import templates.BogoSorting;
+import templates.Sort;
 import utils.Delays;
 import utils.Highlights;
 import utils.Reads;
@@ -32,15 +32,15 @@ SOFTWARE.
  *
  */
 
-final public class BogoSort extends BogoSorting {
+final public class BogoSort extends Sort {
     public BogoSort(Delays delayOps, Highlights markOps, Reads readOps, Writes writeOps) {
         super(delayOps, markOps, readOps, writeOps);
         
         this.setSortPromptID("Bogo");
         this.setRunAllID("Bogo Sort");
-        this.setReportSortID("Bogosort");
-        this.setCategory("Distributive Sorts");
-        this.isComparisonBased(false); //Comparisons are not used to swap elements
+        this.setReportSortID("Bogo Sort");
+        this.setCategory("Impractical Sorts");
+        this.isComparisonBased(true);
         this.isBucketSort(false);
         this.isRadixSort(false);
         this.isUnreasonablySlow(true);
@@ -48,10 +48,31 @@ final public class BogoSort extends BogoSorting {
         this.isBogoSort(true);
     }
 
-    @Override
-    public void runSort(int[] array, int currentLen, int bucketCount) {
-        while(!this.bogoIsSorted(array, currentLen)) {
-            this.bogoSwap(array, currentLen, 0);
+    private void shuffle(int[] array, int start, int end, double sleep, int dir){ 
+        for(int i=end; i>1; i--){
+            Writes.swap(array, (int)(Math.random()*i), i-1, sleep, true, false);
         }
+    }
+
+    private int checkifsorted(int[] array, int start, int end, double sleep, int dir) {
+        int flag = 0;
+        for(int i=start+1; i<end; i++){
+                Highlights.markArray(1, i-1);
+                Highlights.markArray(2, i);
+if((dir != 0) ? (Reads.compare(array[i-1], array[i]) == 1) : (Reads.compare(array[i-1], array[i]) == -1)){ flag=1; break;}}
+        return flag;
+    }
+
+    private void bogosort(int[] array, int start, int end, double sleep) {
+        while(checkifsorted(array, start, end, sleep, 1) != 0) shuffle(array, start, end, sleep, 1);
+    }
+    
+    public void customSort(int[] array, int start, int end) {
+        this.bogosort(array, start, end, 1);
+    }
+    
+    @Override
+    public void runSort(int[] array, int length, int bucketCount) {
+        this.bogosort(array, 0, length, 0.0875);
     }
 }

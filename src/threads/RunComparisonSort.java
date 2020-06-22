@@ -65,13 +65,13 @@ final public class RunComparisonSort {
         if(ArrayVisualizer.getSortingThread() != null && ArrayVisualizer.getSortingThread().isAlive())
             return;
 
-        //TODO: This code is bugged! It causes the program to forget the sleep ratio specified by the user!
+        //TODO: This code is fixed! It no longer causes the program to forget the sleep ratio specified by the user!
         if(delayOps.skipped()) {
-            delayOps.setSleepRatio(1);
+            delayOps.retrieveSleepRatio();
             delayOps.changeSkipped(false);
         }
 
-        Sounds.toggleSound(true);
+        //Sounds.toggleSound(true);
         ArrayVisualizer.setSortingThread(new Thread() {
             @Override
             public void run() {
@@ -83,7 +83,8 @@ final public class RunComparisonSort {
                     boolean goAhead;
                     
                     ArrayManager.toggleMutableLength(false);
-                    ArrayManager.refreshArray(array, ArrayVisualizer.getCurrentLength(), ArrayVisualizer);
+                    if(Delays.cancel == 0) ArrayManager.refreshArray(array, ArrayVisualizer.getCurrentLength(), ArrayVisualizer);
+                    Delays.cancel = 0;
                     
                     if(sort.getUnreasonablySlow() && ArrayVisualizer.getCurrentLength() >= sort.getUnreasonableLimit()) {
                         goAhead = false;
@@ -130,7 +131,7 @@ final public class RunComparisonSort {
                 catch(Exception e) {
                     e.printStackTrace();
                 }
-                Sounds.toggleSound(false);
+                //Sounds.toggleSound(false);
             }
         });
        
